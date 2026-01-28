@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Gemini 3 + FB Fix) is running!"
+    return "GrowBot Marketing Pro is Ready with New Permissions!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -42,18 +42,18 @@ def telegram_webhook():
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
                     # ပုံဖန်တီးခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=123"
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=200"
                     
-                    # Facebook Fix: Deprecated Error ကိုကျော်လွှားရန် /feed endpoint သို့ ပုံနှင့်စာသားတွဲတင်ခြင်း
-                    fb_url = f"https://graph.facebook.com/v21.0/me/feed?access_token={PAGE_ACCESS_TOKEN}"
+                    # Facebook API Call (New Permission ဖြင့် ပုံတင်ခြင်း)
+                    fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
                     fb_payload = {
-                        "message": post_content,
-                        "link": image_url
+                        "url": image_url,
+                        "caption": post_content
                     }
                     fb_res = requests.post(fb_url, json=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ ပုံနှင့်စာသား တက်သွားပါပြီ။\n\n📄 စာသား:\n{post_content}")
                     else:
                         send_tg_message(f"❌ Facebook API Error: {fb_res}")
                 except Exception as e:
