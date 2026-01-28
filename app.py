@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Gemini 3 Flash) is Ready!"
+    return "GrowBot Marketing Pro (Gemini 3 + FB Fix) is running!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -33,33 +33,29 @@ def telegram_webhook():
             else:
                 send_tg_message(f"'{text}' အတွက် Marketing Post ကို Gemini 3 နဲ့ စရေးနေပါပြီ...")
                 
-                # CEO ရဲ့ Model List အရ အသစ်ဆုံးဖြစ်တဲ့ gemini-3-flash-preview ကို သုံးထားပါတယ်
+                # Gemini 3 Flash Preview ကို အသုံးပြုထားပါသည်
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
-                
-                payload = {
-                    "contents": [{
-                        "parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis. Focus on SME business growth."}]
-                    }]
-                }
+                payload = {"contents": [{"parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis."}]}]}
                 
                 try:
                     res = requests.post(gemini_url, json=payload).json()
-                    
-                    if 'candidates' not in res:
-                        send_tg_message(f"⚠️ Gemini Error: {res.get('error', {}).get('message', 'Unknown Error')}")
-                        return "error", 200
-
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=88"
                     
-                    # Facebook ပေါ်တင်ခြင်း
-                    fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
-                    fb_res = requests.post(fb_url, json={"url": image_url, "caption": post_content}).json()
+                    # ပုံဖန်တီးခြင်း
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=123"
+                    
+                    # Facebook Fix: Deprecated Error ကိုကျော်လွှားရန် /feed endpoint သို့ ပုံနှင့်စာသားတွဲတင်ခြင်း
+                    fb_url = f"https://graph.facebook.com/v21.0/me/feed?access_token={PAGE_ACCESS_TOKEN}"
+                    fb_payload = {
+                        "message": post_content,
+                        "link": image_url
+                    }
+                    fb_res = requests.post(fb_url, json=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Gemini 3 နဲ့ ရေးသားပြီး Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
                     else:
-                        send_tg_message(f"❌ Facebook Error: {fb_res}")
+                        send_tg_message(f"❌ Facebook API Error: {fb_res}")
                 except Exception as e:
                     send_tg_message(f"⚠️ System Error: {str(e)}")
                     
