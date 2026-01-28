@@ -18,9 +18,8 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro is running via Telegram!"
+    return "GrowBot Marketing Pro is Live and Ready!"
 
-# Telegram ဆီက စာလာရင် အလုပ်လုပ်မည့်နေရာ
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
     data = request.json
@@ -28,34 +27,42 @@ def telegram_webhook():
         chat_id = str(data["message"]["chat"]["id"])
         text = data["message"].get("text", "")
 
-        # CEO ဆီက စာဟုတ်မဟုတ် စစ်ခြင်း
         if chat_id == MY_CHAT_ID:
             if text.lower() == "/start":
                 send_tg_message("မင်္ဂလာပါ CEO။ Post တင်ခိုင်းချင်ရင် ခေါင်းစဉ် (Topic) ကို ရိုက်ပို့ပေးပါခင်ဗျာ။")
             else:
-                send_tg_message(f"'{text}' ခေါင်းစဉ်နဲ့ Post ကို AI စရေးနေပါပြီ။ ခဏစောင့်ပေးပါ...")
+                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
                 
-                # ၁။ Gemini AI ဖြင့် Content ရေးခြင်း
+                # Model ရှာမတွေ့တဲ့ Error ကို ဖြေရှင်းရန် v1 နှင့် gemini-1.5-flash ကို သုံးထားပါသည်
                 gemini_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
-                payload = {"contents": [{"parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis."}]}]}
+                
+                payload = {
+                    "contents": [{
+                        "parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis. Make it engaging for SMEs."}]
+                    }]
+                }
                 
                 try:
                     res = requests.post(gemini_url, json=payload).json()
+                    
+                    # Error စစ်ဆေးခြင်း
+                    if 'candidates' not in res:
+                        send_tg_message(f"⚠️ Gemini Error: {res.get('error', {}).get('message', 'Unknown Error')}")
+                        return "error", 200
+
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=100"
                     
-                    # ၂။ AI ပုံဖန်တီးခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=99"
-                    
-                    # ၃။ Facebook ပေါ်တင်ခြင်း
+                    # Facebook ပေါ်တင်ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
                     fb_res = requests.post(fb_url, json={"url": image_url, "caption": post_content}).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 Content:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook Page မှာ တင်ပြီးပါပြီ။\n\n📄 Content:\n{post_content}")
                     else:
-                        send_tg_message(f"❌ FB Error: {fb_res}")
+                        send_tg_message(f"❌ Facebook Error: {fb_res}")
                 except Exception as e:
-                    send_tg_message(f"⚠️ Error: {str(e)}")
+                    send_tg_message(f"⚠️ System Error: {str(e)}")
                     
     return "ok", 200
 
