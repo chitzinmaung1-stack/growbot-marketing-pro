@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro is Running Perfectly!"
+    return "GrowBot Marketing Pro (Gemini 3 Flash) is Ready!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -31,14 +31,14 @@ def telegram_webhook():
             if text.lower() == "/start":
                 send_tg_message("မင်္ဂလာပါ CEO။ Post တင်ခိုင်းချင်ရင် ခေါင်းစဉ် (Topic) ကို ရိုက်ပို့ပေးပါခင်ဗျာ။")
             else:
-                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ။ ခဏစောင့်ပေးပါ...")
+                send_tg_message(f"'{text}' အတွက် Marketing Post ကို Gemini 3 နဲ့ စရေးနေပါပြီ...")
                 
-                # Model ရှာမတွေ့သည့် Error အတွက် gemini-pro နှင့် v1 ကို အသုံးပြုထားပါသည်
-                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GOOGLE_API_KEY}"
+                # CEO ရဲ့ Model List အရ အသစ်ဆုံးဖြစ်တဲ့ gemini-3-flash-preview ကို သုံးထားပါတယ်
+                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
                 
                 payload = {
                     "contents": [{
-                        "parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis. Focus on business benefits."}]
+                        "parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis. Focus on SME business growth."}]
                     }]
                 }
                 
@@ -50,14 +50,14 @@ def telegram_webhook():
                         return "error", 200
 
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=55"
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=88"
                     
                     # Facebook ပေါ်တင်ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
                     fb_res = requests.post(fb_url, json={"url": image_url, "caption": post_content}).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Gemini 3 နဲ့ ရေးသားပြီး Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
                     else:
                         send_tg_message(f"❌ Facebook Error: {fb_res}")
                 except Exception as e:
