@@ -33,8 +33,8 @@ def telegram_webhook():
             else:
                 send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
                 
-                # Model ရှာမတွေ့တဲ့ Error ကို ဖြေရှင်းရန် v1 နှင့် gemini-1.5-flash ကို သုံးထားပါသည်
-                gemini_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+                # Model ရှာမတွေ့တဲ့ Error ကို ဖြေရှင်းရန် v1 နှင့် gemini-2.0-flash ကို သုံးထားပါသည်
+                gemini_url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key={GOOGLE_API_KEY}"
                 
                 payload = {
                     "contents": [{
