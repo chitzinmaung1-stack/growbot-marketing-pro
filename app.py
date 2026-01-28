@@ -20,7 +20,7 @@ def auto_post():
     AI က ဝန်ထမ်းစရိတ်သက်သာပြီး ၂၄ နာရီအလုပ်လုပ်နိုင်ကြောင်း SME တွေအတွက် Facebook Post တစ်ခု မြန်မာလို ရေးပေးပါ။
     စာသားထဲမှာ GrowBot Agency နဲ့ ချိတ်ဆက်ဖို့ တိုက်တွန်းချက်ပါရမယ်။
     """
-    gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+    gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GOOGLE_API_KEY}"
     
     try:
         gemini_res = requests.post(gemini_url, json={"contents": [{"parts": [{"text": f"{system_instruction}\nTopic: {topic}"}]}]})
