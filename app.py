@@ -22,7 +22,7 @@ def home():
 @app.route('/test-post')
 def test_post():
     topic = "Digital Marketing benefits for SME"
-    gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+    gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GOOGLE_API_KEY}"
     
     # ပိုမိုရိုးရှင်းသော Prompt ကိုသုံးပြီး စမ်းသပ်ခြင်း
     payload = {
