@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Single Post Mode) is Running!"
+    return "GrowBot Marketing Pro (High-Tech Image Mode) is Active!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -29,15 +29,15 @@ def telegram_webhook():
 
         if chat_id == MY_CHAT_ID:
             if text.lower() == "/start":
-                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ Post တစ်ခုတည်းကိုပဲ သေသပ်စွာ တင်ပေးပါ့မယ်။")
+                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ AI နည်းပညာဆန်တဲ့ High-Tech ပုံနဲ့အတူ တင်ပေးပါ့မယ်။")
             else:
-                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
+                send_tg_message(f"'{text}' အတွက် Post နဲ့ High-Tech Design ကို AI စရေးနေပါပြီ...")
                 
-                # Gemini 3 Flash Instruction ကို တိကျအောင် ပြင်ထားပါသည်
+                # Gemini 3 Flash ကနေ Content ရေးသားခြင်း
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
                 payload = {
                     "contents": [{
-                        "parts": [{"text": f"Write only ONE professional and highly engaging Facebook marketing post about {text} in Burmese with emojis. Do not give options, just the final post content."}]
+                        "parts": [{"text": f"Write only ONE professional Facebook marketing post about {text} in Burmese with emojis. Focus on business value."}]
                     }]
                 }
                 
@@ -45,7 +45,9 @@ def telegram_webhook():
                     res = requests.post(gemini_url, json=payload).json()
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=700"
+                    # AI နည်းပညာစနစ်ကို ဦးစားပေးသော High-Tech Prompt (စာသားမပါပါ)
+                    image_prompt = f"Futuristic AI brain and digital neural network, glowing blue and purple circuitry, holographic business data analytics, cybernetic aesthetic, cinematic lighting, 8k resolution, professional tech agency style"
+                    image_url = f"https://pollinations.ai/p/{image_prompt.replace(' ', '_')}?width=1024&height=1024&seed=999"
                     
                     # Facebook Feed သို့ တင်ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/feed"
@@ -57,7 +59,7 @@ def telegram_webhook():
                     fb_res = requests.post(fb_url, data=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Post အသစ်ကို Facebook မှာ တင်ပြီးပါပြီ။")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! AI Tech Design ပုံနှင့်အတူ Facebook မှာ တင်ပြီးပါပြီ။")
                     else:
                         send_tg_message(f"❌ Facebook Error: {fb_res}")
                 except Exception as e:
