@@ -19,7 +19,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Direct File Upload) is Active!"
+    return "GrowBot Marketing Pro (V3 - Final Fix) is Active!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -44,27 +44,30 @@ def telegram_webhook():
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
                     # ၂။ ပုံကို Download ဆွဲယူခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=250"
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=300"
                     img_response = requests.get(image_url)
                     
                     if img_response.status_code == 200:
-                        img_file = io.BytesIO(img_response.content)
-                        img_file.name = "marketing_image.jpg"
-                        
-                        # ၃။ Facebook သို့ File အစစ်အနေဖြင့် တိုက်ရိုက်ပို့ဆောင်ခြင်း
+                        # ၃။ Facebook သို့ Multipart File အဖြစ် တိုက်ရိုက်ပို့ဆောင်ခြင်း
                         fb_url = f"https://graph.facebook.com/v21.0/me/photos"
-                        params = {'access_token': PAGE_ACCESS_TOKEN}
-                        files = {'source': ('marketing_image.jpg', img_file, 'image/jpeg')}
-                        data = {'caption': post_content}
                         
-                        fb_res = requests.post(fb_url, params=params, files=files, data=data).json()
+                        # File Data ကို Tuple အနေနဲ့ အတိအကျ သတ်မှတ်ခြင်း
+                        files = {
+                            'source': ('image.jpg', io.BytesIO(img_response.content), 'image/jpeg')
+                        }
+                        params = {
+                            'access_token': PAGE_ACCESS_TOKEN,
+                            'caption': post_content
+                        }
+                        
+                        fb_res = requests.post(fb_url, params=params, files=files).json()
                         
                         if "id" in fb_res:
                             send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ ပုံနှင့်စာသား တိုက်ရိုက်တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
                         else:
                             send_tg_message(f"❌ Facebook API Error: {fb_res}")
                     else:
-                        send_tg_message("⚠️ Image generation failed to download.")
+                        send_tg_message("⚠️ AI Image generation failed to download.")
                 except Exception as e:
                     send_tg_message(f"⚠️ System Error: {str(e)}")
                     
