@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Link Bypass Mode) is Live!"
+    return "GrowBot Marketing Pro (Single Post Mode) is Running!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -29,32 +29,35 @@ def telegram_webhook():
 
         if chat_id == MY_CHAT_ID:
             if text.lower() == "/start":
-                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ ပုံနဲ့စာသားကို Facebook က လက်ခံတဲ့နည်းနဲ့ တင်ပေးပါ့မယ်။")
+                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ Post တစ်ခုတည်းကိုပဲ သေသပ်စွာ တင်ပေးပါ့မယ်။")
             else:
-                send_tg_message(f"'{text}' အတွက် Post ကို Gemini 3 နဲ့ စရေးနေပါပြီ...")
+                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
                 
-                # Gemini 3 Flash Preview ဖြင့် Content ရေးသားခြင်း
+                # Gemini 3 Flash Instruction ကို တိကျအောင် ပြင်ထားပါသည်
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
-                payload = {"contents": [{"parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis."}]}]}
+                payload = {
+                    "contents": [{
+                        "parts": [{"text": f"Write only ONE professional and highly engaging Facebook marketing post about {text} in Burmese with emojis. Do not give options, just the final post content."}]
+                    }]
+                }
                 
                 try:
                     res = requests.post(gemini_url, json=payload).json()
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
-                    # ပုံ Link ဖန်တီးခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=500"
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=700"
                     
-                    # Facebook သို့ /feed endpoint သတုံးပြီး ပုံကို link အနေနဲ့ တွဲတင်ခြင်း (Bypass Method)
+                    # Facebook Feed သို့ တင်ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/feed"
                     fb_payload = {
                         "message": post_content,
-                        "link": image_url, # ပုံကို file အဖြစ်မတင်ဘဲ link အဖြစ်တင်ခြင်း
+                        "link": image_url,
                         "access_token": PAGE_ACCESS_TOKEN
                     }
                     fb_res = requests.post(fb_url, data=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 Content:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Post အသစ်ကို Facebook မှာ တင်ပြီးပါပြီ။")
                     else:
                         send_tg_message(f"❌ Facebook Error: {fb_res}")
                 except Exception as e:
