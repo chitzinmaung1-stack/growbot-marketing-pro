@@ -1,5 +1,6 @@
 import os
 import requests
+import io
 from flask import Flask, request
 from dotenv import load_dotenv
 
@@ -18,7 +19,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro is Perfect Now!"
+    return "GrowBot Marketing Pro (Advanced File Handling) is running!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -31,26 +32,28 @@ def telegram_webhook():
             if text.lower() == "/start":
                 send_tg_message("မင်္ဂလာပါ CEO။ Post တင်ခိုင်းချင်ရင် ခေါင်းစဉ် (Topic) ကို ရိုက်ပို့ပေးပါခင်ဗျာ။")
             else:
-                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
+                send_tg_message(f"'{text}' အတွက် Marketing Post ကို Gemini 3 နဲ့ စရေးနေပါပြီ...")
                 
                 # Gemini 3 Flash Preview ကို အသုံးပြုထားပါသည်
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
                 payload = {"contents": [{"parts": [{"text": f"Write a professional Facebook marketing post about {text} in Burmese with emojis."}]}]}
                 
                 try:
+                    # ၁။ စာသားဖန်တီးခြင်း
                     res = requests.post(gemini_url, json=payload).json()
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
-                    # ပုံ Link ကို Facebook မှ ဖတ်နိုင်သော ပုံစံသို့ ပြောင်းလဲခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=99"
+                    # ၂။ ပုံကို Buffer ထဲသို့ Download ဆွဲခြင်း (Facebook Error ကိုကျော်လွှားရန်)
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=150"
+                    img_data = requests.get(image_url).content
+                    img_file = io.BytesIO(img_data)
+                    img_file.name = "post_image.jpg"
                     
-                    # Facebook သို့ ပုံနှင့်စာသား တိုက်ရိုက်တင်ခြင်း
+                    # ၃။ Facebook သို့ File အနေဖြင့် တိုက်ရိုက်ပို့ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
-                    fb_payload = {
-                        "url": image_url,
-                        "caption": post_content
-                    }
-                    fb_res = requests.post(fb_url, json=fb_payload).json()
+                    files = {'source': img_file}
+                    data = {'caption': post_content}
+                    fb_res = requests.post(fb_url, files=files, data=data).json()
                     
                     if "id" in fb_res:
                         send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
