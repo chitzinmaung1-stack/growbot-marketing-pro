@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 
-# Key များ ဆွဲယူခြင်း
+# Environment Variables
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 PAGE_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro is Ready with New Permissions!"
+    return "GrowBot Marketing Pro is Perfect Now!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -31,7 +31,7 @@ def telegram_webhook():
             if text.lower() == "/start":
                 send_tg_message("မင်္ဂလာပါ CEO။ Post တင်ခိုင်းချင်ရင် ခေါင်းစဉ် (Topic) ကို ရိုက်ပို့ပေးပါခင်ဗျာ။")
             else:
-                send_tg_message(f"'{text}' အတွက် Marketing Post ကို Gemini 3 နဲ့ စရေးနေပါပြီ...")
+                send_tg_message(f"'{text}' အတွက် Marketing Post ကို AI စရေးနေပါပြီ...")
                 
                 # Gemini 3 Flash Preview ကို အသုံးပြုထားပါသည်
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
@@ -41,10 +41,10 @@ def telegram_webhook():
                     res = requests.post(gemini_url, json=payload).json()
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
-                    # ပုံဖန်တီးခြင်း
-                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=200"
+                    # ပုံ Link ကို Facebook မှ ဖတ်နိုင်သော ပုံစံသို့ ပြောင်းလဲခြင်း
+                    image_url = f"https://pollinations.ai/p/business_marketing_{text.replace(' ', '_')}?width=1024&height=1024&seed=99"
                     
-                    # Facebook API Call (New Permission ဖြင့် ပုံတင်ခြင်း)
+                    # Facebook သို့ ပုံနှင့်စာသား တိုက်ရိုက်တင်ခြင်း
                     fb_url = f"https://graph.facebook.com/v21.0/me/photos?access_token={PAGE_ACCESS_TOKEN}"
                     fb_payload = {
                         "url": image_url,
@@ -53,7 +53,7 @@ def telegram_webhook():
                     fb_res = requests.post(fb_url, json=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ ပုံနှင့်စာသား တက်သွားပါပြီ။\n\n📄 စာသား:\n{post_content}")
+                        send_tg_message(f"✅ အောင်မြင်ပါသည်! Facebook မှာ တင်ပြီးပါပြီ။\n\n📄 စာသား:\n{post_content}")
                     else:
                         send_tg_message(f"❌ Facebook API Error: {fb_res}")
                 except Exception as e:
