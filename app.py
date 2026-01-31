@@ -18,7 +18,7 @@ def send_tg_message(text):
 
 @app.route('/')
 def home():
-    return "GrowBot Marketing Pro (Photo Direct Mode) is Active!"
+    return "GrowBot Marketing Pro (Optimized Feed Mode) is Active!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -29,11 +29,11 @@ def telegram_webhook():
 
         if chat_id == MY_CHAT_ID:
             if text.lower() == "/start":
-                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ AI Tech Design ပုံအစစ်နဲ့အတူ တင်ပေးပါ့မယ်။")
+                send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ AI Tech ပုံအကြီးကြီးနဲ့အတူ တင်ပေးပါ့မယ်။")
             else:
-                send_tg_message(f"'{text}' အတွက် Post နဲ့ High-Tech Design ကို AI စရေးနေပါပြီ...")
+                send_tg_message(f"'{text}' အတွက် Post ကို AI စရေးနေပါပြီ...")
                 
-                # Gemini 3 Flash Content Generation
+                # Gemini 3 Flash Content
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GOOGLE_API_KEY}"
                 payload = {
                     "contents": [{"parts": [{"text": f"Write only ONE professional Facebook marketing post about {text} in Burmese with emojis."}]}]
@@ -44,22 +44,22 @@ def telegram_webhook():
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
                     # High-Tech Image URL
-                    image_prompt = "Futuristic AI technology, digital neural network, glowing blue circuitry, cinematic 8k resolution"
+                    image_prompt = "Futuristic AI technology digital neural network glowing blue circuitry cinematic 8k"
                     image_url = f"https://pollinations.ai/p/{image_prompt.replace(' ', '_')}?width=1024&height=1024&seed=999"
                     
-                    # ✅ အသေချာဆုံးနည်းလမ်း: me/photos ကိုသုံးပြီး တင်ခြင်း
-                    fb_photo_url = "https://graph.facebook.com/v21.0/me/photos"
+                    # ✅ Facebook Feed Endpoint ကိုပဲ ပုံကြီးကြီးပေါ်အောင် သုံးခြင်း
+                    fb_url = "https://graph.facebook.com/v21.0/me/feed"
                     fb_payload = {
-                        "url": image_url,
-                        "caption": post_content, # စာသားကို caption နေရာမှာ ထည့်ရပါမယ်
+                        "message": post_content,
+                        "link": image_url,    # Post ရဲ့ link နေရာမှာ ပုံကိုပြရန်
+                        "picture": image_url, # ပုံအကြီး (Large Preview) အဖြစ်ပေါ်ရန်
                         "access_token": PAGE_ACCESS_TOKEN
                     }
-                    fb_res = requests.post(fb_photo_url, data=fb_payload).json()
+                    fb_res = requests.post(fb_url, data=fb_payload).json()
                     
                     if "id" in fb_res:
-                        send_tg_message("✅ အောင်မြင်ပါသည်! ပုံအကြီးကြီးနဲ့အတူ Facebook မှာ တင်ပြီးပါပြီ။")
+                        send_tg_message("✅ အောင်မြင်ပါသည်! Facebook မှာ ပုံနှင့်အတူ တင်ပြီးပါပြီ။")
                     else:
-                        # Error တက်ရင် ဘာကြောင့်လဲဆိုတာ အသေးစိတ်ပြရန်
                         send_tg_message(f"❌ Facebook Error: {fb_res.get('error', {}).get('message')}")
                         
                 except Exception as e:
