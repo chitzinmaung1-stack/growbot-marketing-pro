@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 
-# Environment Variables
+# Environment Variables (Render မှာ Setting > Environment ထဲမှာ ထည့်ပေးရမယ့် နာမည်များ)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 PAGE_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -27,6 +27,7 @@ def telegram_webhook():
         chat_id = str(data["message"]["chat"]["id"])
         text = data["message"].get("text", "")
 
+        # CEO ဆီကလာတဲ့ စာဟုတ်မဟုတ် စစ်ဆေးခြင်း
         if chat_id == MY_CHAT_ID:
             if text.lower() == "/start":
                 send_tg_message("မင်္ဂလာပါ CEO။ Topic ပို့ပေးပါ။ AI နည်းပညာဆန်တဲ့ High-Tech ပုံနဲ့အတူ တင်ပေးပါ့မယ်။")
@@ -49,11 +50,12 @@ def telegram_webhook():
                     image_prompt = "Futuristic AI brain and digital neural network, glowing blue and purple circuitry, holographic business data analytics, cybernetic aesthetic, cinematic lighting, 8k resolution, professional tech agency style"
                     image_url = f"https://pollinations.ai/p/{image_prompt.replace(' ', '_')}?width=1024&height=1024&seed=999"
                     
-                    # Facebook Feed သို့ တင်ခြင်း (link အစား picture ကို သုံးထားသည်)
+                    # ✅ Facebook Feed သို့ တင်ခြင်း (link ရော picture ရော ပါဝင်သော ဗားရှင်း)
                     fb_url = "https://graph.facebook.com/v21.0/me/feed"
                     fb_payload = {
                         "message": post_content,
-                        "picture": image_url,
+                        "picture": image_url,  # ပုံအကြီးကြီးပေါ်စေရန်
+                        "link": image_url,     # Facebook Error မတက်စေရန်
                         "access_token": PAGE_ACCESS_TOKEN
                     }
                     fb_res = requests.post(fb_url, data=fb_payload).json()
@@ -69,4 +71,5 @@ def telegram_webhook():
     return "ok", 200
 
 if __name__ == "__main__":
+    # Render အတွက် Port သတ်မှတ်ချက်
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
