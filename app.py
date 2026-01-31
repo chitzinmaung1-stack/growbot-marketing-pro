@@ -51,16 +51,16 @@ def telegram_webhook():
                     image_prompt = f"Futuristic AI brain and digital neural network, glowing blue and purple circuitry, holographic business data analytics, cybernetic aesthetic, cinematic lighting, 8k resolution, professional tech agency style"
                     image_url = f"https://pollinations.ai/p/{image_prompt.replace(' ', '_')}?width=1024&height=1024&seed=999"
                     
-                    # ✅ ပုံကို Full-size Photo အဖြစ်တင်ရန် ပြင်ဆင်ထားသောအပိုင်း
-                    # link နေရာမှာ url ကိုသုံးပြီး feed အစား photos endpoint ကို ပြောင်းသုံးထားပါတယ်
-                    fb_photo_url = f"https://graph.facebook.com/v21.0/me/photos"
-                    fb_payload = {
-                        "caption": post_content,  # message အစား caption ကို သုံးရပါမယ်
-                        "url": image_url,        # link အစား url ကို သုံးရပါမယ်
-                        "access_token": PAGE_ACCESS_TOKEN
-                    }
-                    fb_res = requests.post(fb_photo_url, data=fb_payload).json()
-                    
+                    # Facebook Feed သို့ တင်ခြင်း
+fb_url = f"https://graph.facebook.com/v21.0/me/feed"
+fb_payload = {
+    "message": post_content,
+    "picture": image_url,  # link အစား picture ကို သုံးပါ
+    "access_token": PAGE_ACCESS_TOKEN
+}
+fb_res = requests.post(fb_url, data=fb_payload).json()
+
+                  
                     if "id" in fb_res:
                         send_tg_message(f"✅ အောင်မြင်ပါသည်! AI Tech Design ပုံအကြီးကြီးနှင့်အတူ Facebook မှာ တင်ပြီးပါပြီ။")
                     else:
