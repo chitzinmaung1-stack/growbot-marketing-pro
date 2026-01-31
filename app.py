@@ -20,8 +20,6 @@ def send_tg_message(text):
 def home():
     return "GrowBot Marketing Pro (High-Tech Image Mode) is Active!"
 
-# ... (အပေါ်က import နဲ့ config တွေက အတူတူပါပဲ)
-
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
     data = request.json
@@ -47,31 +45,28 @@ def telegram_webhook():
                     res = requests.post(gemini_url, json=payload).json()
                     post_content = res['candidates'][0]['content']['parts'][0]['text']
                     
-                    # High-Tech Image Prompt
-                    image_prompt = f"Futuristic AI brain and digital neural network, glowing blue and purple circuitry, holographic business data analytics, cybernetic aesthetic, cinematic lighting, 8k resolution, professional tech agency style"
+                    # AI နည်းပညာစနစ်ကို ဦးစားပေးသော High-Tech Prompt
+                    image_prompt = "Futuristic AI brain and digital neural network, glowing blue and purple circuitry, holographic business data analytics, cybernetic aesthetic, cinematic lighting, 8k resolution, professional tech agency style"
                     image_url = f"https://pollinations.ai/p/{image_prompt.replace(' ', '_')}?width=1024&height=1024&seed=999"
                     
-                    # Facebook Feed သို့ တင်ခြင်း
-fb_url = f"https://graph.facebook.com/v21.0/me/feed"
-fb_payload = {
-    "message": post_content,
-    "picture": image_url,  # link အစား picture ကို သုံးပါ
-    "access_token": PAGE_ACCESS_TOKEN
-}
-fb_res = requests.post(fb_url, data=fb_payload).json()
-
-                  
+                    # Facebook Feed သို့ တင်ခြင်း (link အစား picture ကို သုံးထားသည်)
+                    fb_url = "https://graph.facebook.com/v21.0/me/feed"
+                    fb_payload = {
+                        "message": post_content,
+                        "picture": image_url,
+                        "access_token": PAGE_ACCESS_TOKEN
+                    }
+                    fb_res = requests.post(fb_url, data=fb_payload).json()
+                    
                     if "id" in fb_res:
-                        send_tg_message(f"✅ အောင်မြင်ပါသည်! AI Tech Design ပုံအကြီးကြီးနှင့်အတူ Facebook မှာ တင်ပြီးပါပြီ။")
+                        send_tg_message("✅ အောင်မြင်ပါသည်! AI Tech Design ပုံနှင့်အတူ Facebook မှာ တင်ပြီးပါပြီ။")
                     else:
                         send_tg_message(f"❌ Facebook Error: {fb_res}")
+                        
                 except Exception as e:
                     send_tg_message(f"⚠️ System Error: {str(e)}")
                     
     return "ok", 200
-
-# ... (ကျန်တဲ့အပိုင်းတွေက အတူတူပါပဲ)
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
